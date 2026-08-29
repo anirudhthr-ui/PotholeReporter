@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pothole Reporter - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>My Dashboard</h1>
+            <p>View your pothole reports and detections.</p>
+        </header>
+
+        <nav>
+            <a href="index.html">📍 Report Pothole</a>
+            <a href="dashboard.html">📊 Dashboard</a>
+        </nav>
+
+        <main>
+
+            <section class="report-card">
+                <h2>Possible Detections</h2>
+
+                <div id="detectionsList">
+
+                    <div class="detection-card" id="detection1">
+
+                        <h3>⚠️ Possible Pothole</h3>
+
+                        <p>📍 Main Road, Hyderabad</p>
+
+                        <p>🕐 Detected today</p>
+
+                        <p>This detection was automatically recorded by the road-monitoring device.</p>
+
+                        <button onclick="reportDetection()">Report</button>
+                        <button onclick="ignoreDetection()">Ignore</button>
+
+                        <p id="detectionMessage"></p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="reports">
+
+                <h2>My Reports</h2>
+
+                <div id="myReports">
+                    <p>You haven't submitted any reports yet.</p>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script>
+
+        function reportDetection() {
+
+            document.getElementById("detection1").innerHTML = `
+                <h3>🟠 Pothole Reported</h3>
+                <p>📍 Main Road, Hyderabad</p>
+                <p>🕐 Detected today</p>
+                <p class="status">Status: Pending</p>
+            `;
+
+        }
+
+        function ignoreDetection() {
+
+            document.getElementById("detection1").innerHTML = `
+                <h3>✓ Detection Ignored</h3>
+                <p>This possible pothole was not reported.</p>
+            `;
+
+        }
+
+    </script>
+
+</body>
+</html>
