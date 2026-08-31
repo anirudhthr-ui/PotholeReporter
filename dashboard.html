@@ -75,7 +75,13 @@
             getAuth,
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
         // Firebase configuration
 
@@ -95,6 +101,7 @@
         const app = initializeApp(firebaseConfig);
 
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
 
         // Check logged-in user
@@ -145,44 +152,71 @@
         };
 
 
-        // Load saved reports
+        // Load reports from Firestore
 
-        const reports =
-            JSON.parse(localStorage.getItem("potholeReports")) || [];
+const myReports = document.getElementById("myReports");
 
-        const myReports =
-            document.getElementById("myReports");
+onAuthStateChanged(auth, async function(user) {
 
+    if (!user) {
+        myReports.innerHTML = "<p>Please login to see your reports.</p>";
+        return;
+    }
 
-        if (reports.length > 0) {
+    try {
 
-            myReports.innerHTML = "";
+        const reportsQuery = query(
+            collection(db, "potholeReports"),
+            where("userId", "==", user.uid)
+        );
 
-            reports.forEach(function(report) {
+        const querySnapshot = await getDocs(reportsQuery);
 
-                myReports.innerHTML += `
-                    <div class="detection-card">
+        myReports.innerHTML = "";
 
-                        <h3>📍 Pothole Report</h3>
+        if (querySnapshot.empty) {
 
-                        <p>Location: ${report.location}</p>
-
-                        <p>Description: ${report.description}</p>
-
-                        <img
-                            src="${report.photo}"
-                            alt="Pothole photo"
-                            class="report-photo"
-                        >
-
-                        <p class="status">Status: Pending</p>
-
-                    </div>
-                `;
-
-            });
+            myReports.innerHTML = "<p>You haven't reported any potholes yet.</p>";
+            return;
 
         }
+
+        querySnapshot.forEach(function(doc) {
+
+            const report = doc.data();
+
+            myReports.innerHTML += `
+                <div class="detection-card">
+
+                    <h3>📍 Pothole Report</h3>
+
+                    <p>Location: ${report.location}</p>
+
+                    <p>Description: ${report.description}</p>
+
+                    <img
+                        src="${report.photo}"
+                        alt="Pothole photo"
+                        class="report-photo"
+                    >
+
+                    <p class="status">Status: ${report.status}</p>
+
+                </div>
+            `;
+
+        });
+
+    } catch (error) {
+
+        console.error("Error loading reports:", error);
+
+        myReports.innerHTML =
+            "<p>Unable to load your reports.</p>";
+
+    }
+
+});
 
     </script>
 
