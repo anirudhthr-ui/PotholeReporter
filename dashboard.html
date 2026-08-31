@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Pothole Reporter - Dashboard</title>
     <link rel="stylesheet" href="style.css">
@@ -11,12 +13,13 @@
 
         <header>
             <h1>My Dashboard</h1>
-            <p>View your pothole reports and detections.</p>
+            <p id="welcomeMessage">View your pothole reports and detections.</p>
         </header>
 
         <nav>
             <a href="index.html">📍 Report Pothole</a>
             <a href="dashboard.html">📊 Dashboard</a>
+            <a href="login.html">👤 Login</a>
         </nav>
 
         <main>
@@ -47,12 +50,14 @@
 
             </section>
 
+
             <section class="reports">
 
                 <h2>My Reports</h2>
 
                 <div id="myReports">
-                    <p>You haven't submitted any reports yet.</p>
+                    <p id="savedLocation"></p>
+                    <p id="savedDescription"></p>
                 </div>
 
             </section>
@@ -61,9 +66,62 @@
 
     </div>
 
-    <script>
 
-        function reportDetection() {
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+
+        // Firebase configuration
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDc_S37EbeMpNagPOUH7PsKbLmwwmRjLjw",
+            authDomain: "pothole-reporter-d3106.firebaseapp.com",
+            projectId: "pothole-reporter-d3106",
+            storageBucket: "pothole-reporter-d3106.firebasestorage.app",
+            messagingSenderId: "1066650937630",
+            appId: "1:1066650937630:web:6cb5af118b5529ab32c10f",
+            measurementId: "G-5HKX1REJ9J"
+        };
+
+
+        // Initialize Firebase
+
+        const app = initializeApp(firebaseConfig);
+
+        const auth = getAuth(app);
+
+
+        // Check logged-in user
+
+        onAuthStateChanged(auth, function(user) {
+
+            const welcomeMessage =
+                document.getElementById("welcomeMessage");
+
+            if (user) {
+
+                welcomeMessage.textContent =
+                    "Welcome, " + user.email + "! 👋";
+
+            } else {
+
+                welcomeMessage.textContent =
+                    "You are not logged in.";
+
+            }
+
+        });
+
+
+        // Possible detection - Report
+
+        window.reportDetection = function() {
 
             document.getElementById("detection1").innerHTML = `
                 <h3>🟠 Pothole Reported</h3>
@@ -72,18 +130,63 @@
                 <p class="status">Status: Pending</p>
             `;
 
-        }
+        };
 
-        function ignoreDetection() {
+
+        // Possible detection - Ignore
+
+        window.ignoreDetection = function() {
 
             document.getElementById("detection1").innerHTML = `
                 <h3>✓ Detection Ignored</h3>
                 <p>This possible pothole was not reported.</p>
             `;
 
+        };
+
+
+        // Load saved reports
+
+        const reports =
+            JSON.parse(localStorage.getItem("potholeReports")) || [];
+
+        const myReports =
+            document.getElementById("myReports");
+
+
+        if (reports.length > 0) {
+
+            myReports.innerHTML = "";
+
+            reports.forEach(function(report) {
+
+                myReports.innerHTML += `
+                    <div class="detection-card">
+
+                        <h3>📍 Pothole Report</h3>
+
+                        <p>Location: ${report.location}</p>
+
+                        <p>Description: ${report.description}</p>
+
+                        <img
+                            src="${report.photo}"
+                            alt="Pothole photo"
+                            class="report-photo"
+                        >
+
+                        <p class="status">Status: Pending</p>
+
+                    </div>
+                `;
+
+            });
+
         }
 
     </script>
 
 </body>
+
 </html>
+

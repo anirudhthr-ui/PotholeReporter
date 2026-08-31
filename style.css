@@ -112,3 +112,27 @@ nav a:hover {
 .detection-card button {
     margin: 5px;
 }
+.notification {
+    display: none;
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    background-color: var(--white);
+    color: var(--dark);
+    padding: 18px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    border-right: 5px solid var(--green);
+    min-width: 260px;
+    text-align: left;
+}
+.report-photo {
+    width: 250px;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin: 10px auto;
+    display: block;
+}

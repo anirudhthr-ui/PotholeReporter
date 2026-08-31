@@ -17,6 +17,7 @@
     <nav>
     <a href="index.html">📍 Report Pothole</a>
     <a href="dashboard.html">📊 Dashboard</a>
+    <a href="login.html">👤 Login</a>
 </nav>
 
     <main>
@@ -42,14 +43,11 @@
             <input type="file" id="photo" accept="image/*">
 
             <button type="submit">Submit Report</button>
-
+<div id="notification" class="notification">
+    ✅ Pothole reported successfully!
+</div>
         </form>
-    </section>
-
-    <section class="reports">
-        <h2>Reports</h2>
-        <div id="reportsList"></div>
-    </section>
+   
 
 </main>
 
@@ -59,6 +57,6 @@
 
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="script.js"></script>
+<script type="module" src="script.js"></script>
 </body>
 </html>
