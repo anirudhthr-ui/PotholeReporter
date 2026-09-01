@@ -221,9 +221,15 @@ form.addEventListener("submit", async function(event) {
 
 onAuthStateChanged(auth, async function(user) {
 
+    console.log("Checking authority access...");
+
     if (!user) {
+        console.log("No user logged in.");
         return;
     }
+
+    console.log("Logged-in UID:", user.uid);
+    console.log("Logged-in email:", user.email);
 
     try {
 
@@ -231,36 +237,53 @@ onAuthStateChanged(auth, async function(user) {
             doc(db, "users", user.uid)
         );
 
-        if (userDocument.exists()) {
+        console.log("User document exists:", userDocument.exists());
 
-            const userData = userDocument.data();
+        if (!userDocument.exists()) {
+            console.log("❌ No users document found for this UID.");
+            return;
+        }
 
-            if (userData.role === "authority") {
+        const userData = userDocument.data();
 
-                const nav = document.getElementById("mainNav");
+        console.log("Firestore user data:", userData);
+        console.log("Role:", userData.role);
 
-                if (nav) {
+        if (userData.role === "authority") {
 
-                    const authorityLink = document.createElement("a");
+            console.log("✅ AUTHORITY CONFIRMED!");
 
-                    authorityLink.href = "authority.html";
+            const nav = document.getElementById("mainNav");
 
-                    authorityLink.textContent =
-                        "🏛️ Authorized Personnel";
+            if (nav) {
 
-                    nav.appendChild(authorityLink);
+                const authorityLink = document.createElement("a");
 
-                }
+                authorityLink.href = "authority.html";
+
+                authorityLink.textContent =
+                    "🏛️ Authorized Personnel";
+
+                nav.appendChild(authorityLink);
+
+                console.log("✅ Authority button added!");
+
+            } else {
+
+                console.log("❌ mainNav was not found.");
 
             }
+
+        } else {
+
+            console.log("❌ User is not an authority.");
 
         }
 
     } catch (error) {
 
-        console.error("Could not check user role:", error);
+        console.error("❌ Authority check failed:", error);
 
     }
 
 });
-
