@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pothole Reporter - Authority</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>🏛️ Authority Dashboard</h1>
+            <p id="welcomeMessage">Checking access...</p>
+        </header>
+
+        <nav>
+            <a href="index.html">📍 Report Pothole</a>
+            <a href="dashboard.html">📊 My Dashboard</a>
+            <a href="authority.html">🏛️ Authority</a>
+        </nav>
+
+        <main>
+
+            <section class="report-card">
+
+                <h2>🚧 All Pothole Reports</h2>
+
+                <div id="allReports">
+                    <p>Loading reports...</p>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script type="module">
+
+        import { initializeApp } from
+            "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
+        import {
+            getAuth,
+            onAuthStateChanged
+        } from
+            "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+        import {
+    getFirestore,
+    doc,
+    getDoc,
+    collection,
+    getDocs,
+    updateDoc
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+        // Firebase configuration
+
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyDc_S37EbeMpNagPOUH7PsKbLmwwmRjLjw",
+
+            authDomain: "pothole-reporter-d3106.firebaseapp.com",
+
+            projectId: "pothole-reporter-d3106",
+
+            storageBucket: "pothole-reporter-d3106.firebasestorage.app",
+
+            messagingSenderId: "1066650937630",
+
+            appId: "1:1066650937630:web:6cb5af118b5529ab32c10f",
+
+            measurementId: "G-5HKX1REJ9J"
+
+        };
+
+
+        const app = initializeApp(firebaseConfig);
+
+        const auth = getAuth(app);
+
+        const db = getFirestore(app);
+
+
+        const welcomeMessage =
+            document.getElementById("welcomeMessage");
+
+        const allReports =
+            document.getElementById("allReports");
+
+
+        // Check who is logged in
+
+        onAuthStateChanged(auth, async function(user) {
+
+            if (!user) {
+
+                welcomeMessage.textContent =
+                    "🚫 Please login first.";
+
+                allReports.innerHTML =
+                    "<p>You must be logged in to access this page.</p>";
+
+                return;
+
+            }
+
+
+            // Find this user's role
+
+            const userDocument =
+                await getDoc(doc(db, "users", user.uid));
+
+
+            if (!userDocument.exists()) {
+
+                welcomeMessage.textContent =
+                    "🚫 Access denied.";
+
+                allReports.innerHTML =
+                    "<p>You do not have permission to view this page.</p>";
+
+                return;
+
+            }
+
+
+            const userData = userDocument.data();
+
+
+            // Check authority role
+
+            if (userData.role !== "authority") {
+
+                welcomeMessage.textContent =
+                    "🚫 Access denied.";
+
+                allReports.innerHTML =
+                    "<p>You are not authorized to view these reports.</p>";
+
+                return;
+
+            }
+
+
+            // AUTHORITY CONFIRMED
+
+            welcomeMessage.textContent =
+                "Welcome, Authority! 🏛️";
+
+
+            // Load ALL reports
+
+            try {
+
+                const reportsSnapshot =
+                    await getDocs(collection(db, "potholeReports"));
+
+
+                allReports.innerHTML = "";
+
+
+                if (reportsSnapshot.empty) {
+
+                    allReports.innerHTML =
+                        "<p>No pothole reports yet.</p>";
+
+                    return;
+
+                }
+
+
+                reportsSnapshot.forEach(function(document) {
+
+                    const report = document.data();
+
+
+                    allReports.innerHTML += `
+
+                        <div class="detection-card">
+
+                            <h3>🚧 Pothole Report</h3>
+
+                            <p>
+                                📍 Location:
+                                ${report.location}
+                            </p>
+
+                            <p>
+                                📝 Description:
+                                ${report.description}
+                            </p>
+
+                            <img
+                                src="${report.photo}"
+                                alt="Pothole photo"
+                                class="report-photo"
+                            >
+
+                            <p>
+                                👤 Reported by:
+                                ${report.userEmail}
+                            </p>
+
+                            <label>Status:</label>
+
+<select onchange="updateStatus('${document.id}', this.value)">
+
+    <option value="Pending"
+        ${report.status === "Pending" ? "selected" : ""}>
+        Pending
+    </option>
+
+    <option value="Under Review"
+        ${report.status === "Under Review" ? "selected" : ""}>
+        Under Review
+    </option>
+
+    <option value="Resolved"
+        ${report.status === "Resolved" ? "selected" : ""}>
+        Resolved
+    </option>
+
+</select>
+                        </div>
+
+                    `;
+
+                });
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                allReports.innerHTML =
+                    "<p>Unable to load reports.</p>";
+
+            }
+
+        });
+window.updateStatus = async function(reportId, newStatus) {
+
+    try {
+
+        await updateDoc(
+            doc(db, "potholeReports", reportId),
+            {
+                status: newStatus
+            }
+        );
+
+        console.log("Status updated:", newStatus);
+
+    } catch (error) {
+
+        console.error("Error updating status:", error);
+
+        alert("Could not update the status.");
+
+    }
+
+};
+    </script>
+
+</body>
+
+</html>
