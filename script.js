@@ -211,7 +211,11 @@ form.addEventListener("submit", async function(event) {
 
 
     reader.readAsDataURL(photo);
-    // ===============================
+
+});   // ← closes Submit Report
+
+
+// ===============================
 // AUTHORIZED PERSONNEL BUTTON
 // ===============================
 
@@ -260,4 +264,3 @@ onAuthStateChanged(auth, async function(user) {
 
 });
 
-});
