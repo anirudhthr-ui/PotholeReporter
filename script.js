@@ -3,9 +3,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/fireba
 import {
     getFirestore,
     collection,
-    addDoc
+    addDoc,
+    doc,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-
 import {
     getAuth,
     onAuthStateChanged
@@ -210,5 +211,53 @@ form.addEventListener("submit", async function(event) {
 
 
     reader.readAsDataURL(photo);
+    // ===============================
+// AUTHORIZED PERSONNEL BUTTON
+// ===============================
+
+onAuthStateChanged(auth, async function(user) {
+
+    if (!user) {
+        return;
+    }
+
+    try {
+
+        const userDocument = await getDoc(
+            doc(db, "users", user.uid)
+        );
+
+        if (userDocument.exists()) {
+
+            const userData = userDocument.data();
+
+            if (userData.role === "authority") {
+
+                const nav = document.getElementById("mainNav");
+
+                if (nav) {
+
+                    const authorityLink = document.createElement("a");
+
+                    authorityLink.href = "authority.html";
+
+                    authorityLink.textContent =
+                        "🏛️ Authorized Personnel";
+
+                    nav.appendChild(authorityLink);
+
+                }
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error("Could not check user role:", error);
+
+    }
+
+});
 
 });
